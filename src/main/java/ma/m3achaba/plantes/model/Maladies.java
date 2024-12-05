@@ -1,14 +1,13 @@
 package ma.m3achaba.plantes.model;
 
 import jakarta.persistence.Entity;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import lombok.experimental.SuperBuilder;
 import ma.m3achaba.plantes.common.BaseEntity;
 
+@EqualsAndHashCode(callSuper = true)
 @Entity
-@Builder
+@SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
