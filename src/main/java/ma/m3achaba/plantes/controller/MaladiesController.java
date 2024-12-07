@@ -20,7 +20,7 @@ import java.util.List;
 @RequestMapping("/api/maladies")
 @RequiredArgsConstructor
 public class MaladiesController {
-    private final MaladiesService maladiesService;
+    private final MaladiesService  maladiesService;
 
     @GetMapping("/{id}")
     public ResponseEntity<MaladiesResponse> findById(@PathVariable Long id) {
