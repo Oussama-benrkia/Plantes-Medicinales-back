@@ -23,9 +23,6 @@ import java.io.IOException;
 public class JwtAuthFilter extends OncePerRequestFilter {
 
     private final JwtUtils jwtService;
-
-    @Autowired
-    @Lazy  // Ajoutez @Lazy ici pour éviter la dépendance circulaire
     private final UserService accountService;
 
     @Override
