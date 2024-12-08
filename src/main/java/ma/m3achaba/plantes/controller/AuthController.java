@@ -1,23 +1,14 @@
 package ma.m3achaba.plantes.controller;
 
 import lombok.RequiredArgsConstructor;
-import ma.m3achaba.plantes.common.PageResponse;
 import ma.m3achaba.plantes.dto.RegisterRequest;
-import ma.m3achaba.plantes.dto.UserRequest;
-import ma.m3achaba.plantes.dto.UserResponse;
-import ma.m3achaba.plantes.exception.ResourceNotFoundException;
-import ma.m3achaba.plantes.model.User;
 import ma.m3achaba.plantes.services.imp.AuthenticationUserService;
-import ma.m3achaba.plantes.services.imp.UserService;
-import ma.m3achaba.plantes.validation.OnCreate;
-import ma.m3achaba.plantes.validation.OnUpdate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.validation.annotation.Validated;
+
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+
 
 
 @RestController
@@ -26,7 +17,6 @@ import java.util.List;
 public class AuthController {
 
     private final AuthenticationUserService authservice;
-    private final UserService userService;
 
     @PostMapping("/register")
     public ResponseEntity<RegisterRequest> register(@RequestBody RegisterRequest registerRequest) {
