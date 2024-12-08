@@ -16,6 +16,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.function.Function;
 
 @RestController
 @RequiredArgsConstructor
@@ -23,9 +24,9 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping("/admin/user/{id}")
-    public ResponseEntity<UserResponse> findById(@PathVariable Long id) {
+    public ResponseEntity<Object> findById(@PathVariable Long id) {
         return userService.findById(id)
-                .map(ResponseEntity::ok)
+                .map((Function<? super UserResponse, ? extends ResponseEntity<Object>>) ResponseEntity::ok)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
     }
     @GetMapping("/admin/usersPage")

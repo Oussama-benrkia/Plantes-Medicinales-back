@@ -72,7 +72,6 @@ public class UserService implements UserDetailsService, ServiceMetier<UserRespon
     }
     public PageResponse<UserResponse> findAllWithSearch(int page, int size, String search) {
         Pageable pageable = PageRequest.of(page, size);
-
         // Recherche par nom, prénom ou email
         Page<User> users = userRepo.findByNomContainingIgnoreCaseOrPrenomContainingIgnoreCase(search, search, pageable);
         return createPageResponse(users);
@@ -110,7 +109,6 @@ public class UserService implements UserDetailsService, ServiceMetier<UserRespon
         // Retourne l'utilisateur sauvegardé en tant que réponse
         return Optional.ofNullable(userMapper.toResponse(savedUser));
     }
-
 
     @Override
     public Optional<UserResponse> update(UserRequest t, Long id) {
@@ -190,10 +188,8 @@ public class UserService implements UserDetailsService, ServiceMetier<UserRespon
         if (request.getPassword() != null && !request.getPassword().isEmpty()) {
             currentUser.setPassword(passwordEncoder.encode(request.getPassword()));
         }
-
         // Sauvegarder les modifications
         User updatedUser = userRepo.save(currentUser);
-
         // Construire la réponse
         return RegisterRequest.builder()
                 .email(updatedUser.getEmail())
