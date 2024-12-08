@@ -15,11 +15,16 @@ import lombok.NoArgsConstructor;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class RegisterRequest {
+    private int statusCode;
+    private String error;
+    private String message;
+    private String token;
+    private String refreshToken;
+    private String expirationTime;
     private String nom;
     private String prenom;
     private String email;
     private String password;
     private String role;
-    private String token;
 
 }

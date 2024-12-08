@@ -6,7 +6,6 @@ import lombok.RequiredArgsConstructor;
 import ma.m3achaba.plantes.common.PageResponse;
 
 import ma.m3achaba.plantes.dto.RegisterRequest;
-import ma.m3achaba.plantes.dto.RegisterResponse;
 import ma.m3achaba.plantes.dto.UserRequest;
 import ma.m3achaba.plantes.dto.UserResponse;
 import ma.m3achaba.plantes.mapper.UserMapper;
@@ -182,7 +181,7 @@ public class UserService implements UserDetailsService, ServiceMetier<UserRespon
                 .role(currentUser.getRole().name()) // Assuming Role is an enum
                 .build();
     }
-    public RegisterResponse updateProfile(RegisterRequest request) {
+    public RegisterRequest updateProfile(RegisterRequest request) {
         User currentUser = getCurrentUser();
         // Mise à jour des informations
         if (request.getNom() != null) currentUser.setNom(request.getNom());
@@ -196,7 +195,7 @@ public class UserService implements UserDetailsService, ServiceMetier<UserRespon
         User updatedUser = userRepo.save(currentUser);
 
         // Construire la réponse
-        return RegisterResponse.builder()
+        return RegisterRequest.builder()
                 .email(updatedUser.getEmail())
                 .role(updatedUser.getRole().name()) // Assuming Role is an enum
                 .message("Profil mis à jour avec succès.")

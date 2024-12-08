@@ -38,34 +38,28 @@ public class User extends BaseEntity implements UserDetails {
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority(role.name()));
     }
-
     @Override
     public String getUsername() {
-        return email;  // Explicitly return the email as the username
-    }
-
-    @Override
-    public String getPassword() {
-        return password;
+        return this.email;
     }
 
     @Override
     public boolean isAccountNonExpired() {
-        return true; // Adjust based on business logic
+        return true;
     }
 
     @Override
     public boolean isAccountNonLocked() {
-        return true; // Adjust based on business logic
+        return true;
     }
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return true; // Adjust based on business logic
+        return true;
     }
 
     @Override
     public boolean isEnabled() {
-        return true; // Adjust based on business logic
+        return true;
     }
 }
