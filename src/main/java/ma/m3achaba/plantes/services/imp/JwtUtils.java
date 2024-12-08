@@ -3,6 +3,7 @@ package ma.m3achaba.plantes.services.imp;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import ma.m3achaba.plantes.model.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -23,7 +24,7 @@ public class JwtUtils {
 
     public JwtUtils() {
         String secretString = "843567893696976453275974432697R634976R738467TR678T34865R6834R8763T478378637664538745673865783678548735687R3";
-        byte[] keyBytes = Base64.getDecoder().decode(secretString);
+        byte[] keyBytes = Base64.getEncoder().encode(secretString.getBytes()); // Correction : Encodage en Base64
         this.key = new SecretKeySpec(keyBytes, SignatureAlgorithm.HS256.getJcaName());
     }
 
@@ -33,6 +34,7 @@ public class JwtUtils {
 
         return Jwts.builder()
                 .setSubject(userDetails.getUsername())
+                .claim("role", ((User) userDetails).getRole().name())
                 .setIssuedAt(toDate(now))
                 .setExpiration(toDate(expiration))
                 .signWith(key)
@@ -55,6 +57,21 @@ public class JwtUtils {
     public boolean isTokenValid(String token, UserDetails userDetails) {
         final String tokenUsername = extractUsername(token);
         return (tokenUsername.equals(userDetails.getUsername()) && !isTokenExpired(token));
+    }
+
+    public boolean isValidTokenForRole(String token, String role) {
+        try {
+            Claims claims = Jwts.parserBuilder()
+                    .setSigningKey(key)
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
+            String tokenRole = claims.get("role", String.class);
+            return role.equals(tokenRole);
+        } catch (Exception e) {
+            e.printStackTrace(); // Ajout d'un log pour détecter les erreurs
+            return false;
+        }
     }
 
     private boolean isTokenExpired(String token) {

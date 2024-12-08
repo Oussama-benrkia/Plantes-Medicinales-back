@@ -21,34 +21,45 @@ import java.io.IOException;
 @Component
 public class JwtAuthFilter extends OncePerRequestFilter {
 
-    private final JwtUtils jwtService;
-    private final UserService accountService;
+    private final JwtUtils jwtUtils;
+    private final UserService userService;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
-        final String authHeader = request.getHeader("Authorization");
-        final String jwtToken;
-        final String userEmail;
+        String authHeader = request.getHeader("Authorization");
 
-        if (authHeader == null || !authHeader.isBlank()) {
-            filterChain.doFilter(request, response);
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            chain.doFilter(request, response);
             return;
         }
-        jwtToken = authHeader.substring(7);
-        userEmail = jwtService.extractUsername(jwtToken);
-        if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails = accountService.loadUserByUsername(userEmail);
-            if (jwtService.isTokenValid(jwtToken, userDetails )) {
-                SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
-                UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                        userDetails, null, userDetails.getAuthorities()
-                );
-                authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                securityContext.setAuthentication(authToken);
-                SecurityContextHolder.setContext(securityContext);
+
+        String token = authHeader.substring(7);
+        String username = jwtUtils.extractUsername(token);
+
+        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+            UserDetails userDetails = userService.loadUserByUsername(username);
+
+            // Vérifiez le rôle dans le token
+            if (jwtUtils.isTokenValid(token, userDetails)) {
+                String requiredRole = extractRequiredRole(request.getRequestURI());
+                if (jwtUtils.isValidTokenForRole(token, requiredRole)) {
+                    UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+                            userDetails, null, userDetails.getAuthorities());
+                    SecurityContextHolder.getContext().setAuthentication(authToken);
+                } else {
+                    response.sendError(HttpServletResponse.SC_FORBIDDEN, "Rôle non autorisé");
+                    return;
+                }
             }
         }
-        filterChain.doFilter(request, response);
+
+        chain.doFilter(request, response);
+    }
+
+    private String extractRequiredRole(String uri) {
+        if (uri.startsWith("/admin")) return "ADMIN";
+        if (uri.startsWith("/user")) return "USER";
+        return null;
     }
 }
