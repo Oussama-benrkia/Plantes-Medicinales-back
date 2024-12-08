@@ -8,6 +8,9 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
+  main:
+    allow-circular-references: true  # Permet les références circulaires dans Spring (ce n'est pas recommandé mais peut être utile dans certains cas)
+
 logging:
   file:
     path: ./logging/global/logs

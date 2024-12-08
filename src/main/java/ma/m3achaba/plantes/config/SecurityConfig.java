@@ -3,7 +3,6 @@ package ma.m3achaba.plantes.config;
 
 import lombok.RequiredArgsConstructor;
 import ma.m3achaba.plantes.services.imp.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -25,9 +24,9 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @RequiredArgsConstructor
 @EnableMethodSecurity
 public class SecurityConfig {
-    @Autowired
+
     private final JwtAuthFilter jwtAuthFilter;
-    @Autowired
+
     private final UserService accountService;
 
     @Bean

@@ -17,8 +17,5 @@ import ma.m3achaba.plantes.common.BaseEntity;
 public class Maladies extends BaseEntity {
     private String name;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    @JsonIgnoreProperties("maladies")
-    private User user;
+
 }

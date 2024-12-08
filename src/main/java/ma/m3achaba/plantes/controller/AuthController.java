@@ -1,79 +1,39 @@
 package ma.m3achaba.plantes.controller;
 
-
-
+import lombok.RequiredArgsConstructor;
 import ma.m3achaba.plantes.dto.RegisterRequest;
-import ma.m3achaba.plantes.model.User;
+import ma.m3achaba.plantes.dto.RegisterResponse;
 import ma.m3achaba.plantes.services.imp.AuthenticationUserService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
+@RequiredArgsConstructor
+@RequestMapping("/auth")
 public class AuthController {
 
-    @Autowired
-    private AuthenticationUserService authservice;
+    private final AuthenticationUserService authservice;
 
-    @PostMapping("/auth/register")
-    public RegisterRequest register(@RequestBody RegisterRequest registerRequest) {
-        return authservice.register(registerRequest);
+    @PostMapping("/register")
+    public ResponseEntity<RegisterResponse> register(@RequestBody RegisterRequest registerRequest) {
+        RegisterResponse registerResponse = authservice.register(registerRequest);
+        return new ResponseEntity<>(registerResponse, HttpStatus.CREATED);
     }
-    @PostMapping("/auth/login")
-    public RegisterRequest login(@RequestBody RegisterRequest loginRequest) {
-        return authservice.login(loginRequest);
+
+    @PostMapping("/login")
+    public ResponseEntity<RegisterResponse> login(@RequestBody RegisterRequest loginRequest) {
+        RegisterResponse loginResponse = authservice.login(loginRequest);
+        return new ResponseEntity<>(loginResponse, HttpStatus.OK);
     }
-    @PostMapping("/auth/refresh")
-    public RegisterRequest refreshToken(@RequestBody RegisterRequest refreshTokenRequest) {
-        return authservice.refreshToken(refreshTokenRequest);
-    }
-    @GetMapping("/admin/users")
-    public List<User> findAll() {
-        return authservice.findAll();
-    }
-    @PostMapping("/admin/updateUser/{id}")
-    public RegisterRequest updateUser(@PathVariable Long id, @RequestBody RegisterRequest request) {
-        request.setId(id);
-        return authservice.updateUser(request);
-    }
-    @DeleteMapping("/admin/deleteUser/{id}")
-    public void deleteUser(@PathVariable Long id) {
-        authservice.deleteUser(id);
-    }
-    @GetMapping("user/profile")
-    public ResponseEntity<RegisterRequest> getProfile() {
-        try {
-            RegisterRequest profile = authservice.getProfile();
-            return ResponseEntity.ok(profile);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(RegisterRequest.builder()
-                            .statusCode(401)
-                            .error(e.getMessage())
-                            .build());
+
+    @PostMapping("/refresh")
+    public ResponseEntity<RegisterResponse> refreshToken(@RequestBody RegisterRequest refreshTokenRequest) {
+        RegisterResponse refreshResponse = authservice.refreshToken(refreshTokenRequest);
+        if (refreshResponse != null) {
+            return new ResponseEntity<>(refreshResponse, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
-    @PutMapping("user/updateProfile")
-    public ResponseEntity<RegisterRequest> updateProfile(@RequestBody RegisterRequest request) {
-        try {
-            RegisterRequest response = authservice.updateProfile(request);
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(RegisterRequest.builder()
-                            .statusCode(400)
-                            .error(e.getMessage())
-                            .build());
-        }
-    }
-
-
-
-    }
-
-
-
-
+}
