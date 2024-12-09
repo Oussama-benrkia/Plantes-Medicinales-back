@@ -57,9 +57,8 @@ class ImgServiceTest {
     }
 
     @Test
-    void deleteImage_shouldReturnFalseIfIOExceptionOccurs() throws IOException {
+    void deleteImage_shouldReturnFalseIfIOExceptionOccurs() {
         String testFile = "non_existent.jpg";
-        Path testPath = Paths.get(System.getProperty("user.dir"), "uploads", testFile);
 
         // Simulate an IOException
         mockStatic(Files.class, invocation -> {
