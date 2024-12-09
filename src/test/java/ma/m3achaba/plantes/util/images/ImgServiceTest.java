@@ -34,13 +34,14 @@ class ImgServiceTest {
         Path testPath = Paths.get(System.getProperty("user.dir"), "uploads", testFile);
         Files.createDirectories(testPath.getParent());
         Files.writeString(testPath, "Test content");
+
         byte[] result = imgService.imageToByte(testFile);
+
         assertNotNull(result);
         assertEquals("Test content", new String(result));
+
         Files.deleteIfExists(testPath);
     }
-
-
 
     @Test
     void deleteImage_shouldDeleteFile() throws IOException {
@@ -48,8 +49,67 @@ class ImgServiceTest {
         Path testPath = Paths.get(System.getProperty("user.dir"), "uploads", testFile);
         Files.createDirectories(testPath.getParent());
         Files.writeString(testPath, "Test content");
+
         Boolean isDeleted = imgService.deleteImage(testFile);
+
         assertTrue(isDeleted);
         assertFalse(Files.exists(testPath));
+    }
+
+    @Test
+    void deleteImage_shouldReturnFalseIfIOExceptionOccurs() throws IOException {
+        String testFile = "non_existent.jpg";
+        Path testPath = Paths.get(System.getProperty("user.dir"), "uploads", testFile);
+
+        // Simulate an IOException
+        mockStatic(Files.class, invocation -> {
+            if ("exists".equals(invocation.getMethod().getName())) {
+                return true; // Simulate file exists
+            }
+            if ("delete".equals(invocation.getMethod().getName())) {
+                throw new IOException("Test exception");
+            }
+            return invocation.callRealMethod();
+        });
+
+        Boolean result = imgService.deleteImage(testFile);
+
+        assertFalse(result);
+    }
+
+    @Test
+    void addImage_shouldReturnEmptyStringIfFileIsNull() {
+        String result = imgService.addImage(null, ImagesFolder.PLANTE);
+        assertEquals("", result);
+    }
+
+    @Test
+    void addImage_shouldReturnEmptyStringIfFileIsEmpty() {
+        when(mockFile.isEmpty()).thenReturn(true);
+
+        String result = imgService.addImage(mockFile, ImagesFolder.PLANTE);
+
+        assertEquals("", result);
+    }
+
+    @Test
+    void addImage_shouldReturnEmptyStringIfFileNameIsNull() {
+        when(mockFile.getOriginalFilename()).thenReturn(null);
+
+        String result = imgService.addImage(mockFile, ImagesFolder.PLANTE);
+
+        assertEquals("", result);
+    }
+
+    @Test
+    void addImage_shouldReturnEmptyStringIfIOExceptionOccurs() throws IOException {
+        String fileName = "test.jpg";
+        when(mockFile.getOriginalFilename()).thenReturn(fileName);
+        when(mockFile.isEmpty()).thenReturn(false);
+        doThrow(new IOException("Test exception")).when(mockFile).transferTo(any(File.class));
+
+        String result = imgService.addImage(mockFile, ImagesFolder.PLANTE);
+
+        assertEquals("", result);
     }
 }
