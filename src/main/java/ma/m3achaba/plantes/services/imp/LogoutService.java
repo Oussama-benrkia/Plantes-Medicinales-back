@@ -30,6 +30,8 @@ public class LogoutService implements LogoutHandler {
             stored.setRevoked(true);
         }
         repToken.save(stored);*/
+
+
         SecurityContextHolder.clearContext();
         response.setStatus(HttpServletResponse.SC_OK);
     }
