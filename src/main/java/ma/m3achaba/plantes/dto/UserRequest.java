@@ -1,21 +1,22 @@
 package ma.m3achaba.plantes.dto;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
-@Data
-@Builder
-@AllArgsConstructor
-@NoArgsConstructor
-@JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonIgnoreProperties(ignoreUnknown = true)
-public class UserRequest {
-    private String nom;
-    private String prenom;
-    private String email;
-    private String role;
-}
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+import ma.m3achaba.plantes.validation.OnCreate;
+import ma.m3achaba.plantes.validation.OnUpdate;
+
+public record UserRequest(
+        @NotBlank( groups = OnCreate.class, message = "Prenom must not be blank")
+        String prenom,
+        @NotBlank(groups = OnCreate.class,message = "Nom must not be blank")
+        String nom,
+        @NotBlank(groups = OnCreate.class,message = "Email must not be blank")
+        @Email(groups = {OnCreate.class, OnUpdate.class},message = "Email must be a valid email address")
+        String email,
+        @NotBlank(groups = OnCreate.class,message = "Password must not be blank")
+        @Size(groups = OnCreate.class,min = 8, message = "Password must be at least 8 characters long")
+        String password,
+        String role
+) {}
