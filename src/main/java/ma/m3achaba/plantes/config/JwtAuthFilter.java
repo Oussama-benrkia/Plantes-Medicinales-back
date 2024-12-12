@@ -42,8 +42,6 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
             // Vérifiez le rôle dans le token
             if (jwtUtils.isTokenValid(token, userDetails)) {
-                String requiredRole = extractRequiredRole(request.getRequestURI());
-                if (jwtUtils.isValidTokenForRole(token, requiredRole)) {
                     UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                             userDetails, null, userDetails.getAuthorities());
                     SecurityContextHolder.getContext().setAuthentication(authToken);
@@ -51,15 +49,9 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                     response.sendError(HttpServletResponse.SC_FORBIDDEN, "Rôle non autorisé");
                     return;
                 }
-            }
+
         }
 
         chain.doFilter(request, response);
-    }
-
-    private String extractRequiredRole(String uri) {
-        if (uri.startsWith("/admin")) return "ADMIN";
-        if (uri.startsWith("/user")) return "USER";
-        return null;
     }
 }

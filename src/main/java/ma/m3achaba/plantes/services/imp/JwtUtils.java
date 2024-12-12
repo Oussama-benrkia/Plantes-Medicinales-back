@@ -4,6 +4,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import ma.m3achaba.plantes.model.User;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -56,23 +57,20 @@ public class JwtUtils {
 
     public boolean isTokenValid(String token, UserDetails userDetails) {
         final String tokenUsername = extractUsername(token);
-        return (tokenUsername.equals(userDetails.getUsername()) && !isTokenExpired(token));
+        final String tokenRole = extractRole(token);
+        final String userRole = userDetails.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .findFirst()
+                .orElse(null);
+        return (tokenUsername.equals(userDetails.getUsername())
+                && !isTokenExpired(token)
+                && tokenRole != null
+                && tokenRole.equals(userRole));
+    }
+    public String extractRole(String token) {
+        return extractClaims(token, claims -> claims.get("role", String.class)); // adjust for your claim structure
     }
 
-    public boolean isValidTokenForRole(String token, String role) {
-        try {
-            Claims claims = Jwts.parserBuilder()
-                    .setSigningKey(key)
-                    .build()
-                    .parseClaimsJws(token)
-                    .getBody();
-            String tokenRole = claims.get("role", String.class);
-            return role.equals(tokenRole);
-        } catch (Exception e) {
-            e.printStackTrace(); // Ajout d'un log pour détecter les erreurs
-            return false;
-        }
-    }
 
     private boolean isTokenExpired(String token) {
         LocalDateTime expiration = extractExpiration(token);
