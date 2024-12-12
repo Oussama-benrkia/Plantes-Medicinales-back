@@ -25,10 +25,8 @@ public class User extends BaseEntity implements UserDetails {
 
     private String nom;
     private String prenom;
+    @Column(unique = true)
     private String email;
-    @Column(nullable = false, updatable = false)
-    private LocalDateTime createdDate;
-    @JsonIgnore
     private String password;
 
     @Enumerated(EnumType.STRING)

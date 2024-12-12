@@ -120,6 +120,17 @@ public class UserService implements UserDetailsService, ServiceMetier<UserRespon
                         search, search, search, Role.valueOf(role), pageable);
         return createPageResponse(users);
     }
+    public List<UserResponse> findAllWithRole(String role) {
+        return userRepo.findAllByRole(role)
+                .stream().map(userMapper::toResponse).toList();
+    }
+
+    public PageResponse<UserResponse> findAllWithRole(int page, int size, String role) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<User> users = userRepo.findAllByRole(role, pageable);
+        return createPageResponse(users);
+    }
+
 
     private User findUserById(Long id) {
         return userRepo.findById(id)

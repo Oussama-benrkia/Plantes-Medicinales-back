@@ -16,10 +16,10 @@ import java.util.Optional;
 public interface UserRepo extends JpaRepository<User, Long> {
 
     boolean existsByEmail(String email);
-    List<User> findByRole(String role);
+    List<User> findAllByRole(String role);
     List<User> findByNomContainingIgnoreCaseOrPrenomContainingIgnoreCaseOrEmailContainingIgnoreCase(String nom, String prenom,String email);
     Page<User> findByNomContainingIgnoreCaseOrPrenomContainingIgnoreCaseOrEmailContainingIgnoreCase(String nom, String prenom,String email, Pageable pageable);
-    Page<User> findByRole(String role, Pageable pageable);
+    Page<User> findAllByRole(String role, Pageable pageable);
     Optional<User> findByEmail(String email);
     List<User> findByNomContainingIgnoreCaseOrPrenomContainingIgnoreCaseOrEmailContainingIgnoreCaseAndRole(
             String nom, String prenom, String email, Role role);

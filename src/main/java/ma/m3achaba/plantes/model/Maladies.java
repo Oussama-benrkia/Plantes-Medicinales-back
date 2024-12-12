@@ -1,9 +1,6 @@
 package ma.m3achaba.plantes.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.Entity;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 import ma.m3achaba.plantes.common.BaseEntity;
