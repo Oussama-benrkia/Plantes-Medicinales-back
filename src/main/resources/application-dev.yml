@@ -8,6 +8,10 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
+  servlet:
+    multipart:
+      enabled: true
+
 
 logging:
   file:
@@ -19,3 +23,4 @@ logging:
     rollingpolicy:
       max-file-size: 5MB
     max-history: 5
+

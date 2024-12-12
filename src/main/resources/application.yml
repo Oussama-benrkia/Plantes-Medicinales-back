@@ -3,3 +3,6 @@ spring:
     name: Plantes_backend
   profiles:
     active: dev
+file:
+  upload:
+    directory: uploads
