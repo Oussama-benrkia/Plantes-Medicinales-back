@@ -5,6 +5,16 @@ import ma.m3achaba.plantes.validation.OnCreate;
 
 public record PlantesRequest(
         @NotBlank(groups = OnCreate.class, message = "Nom must not be blank")
-        String nom
+
+        String name,
+        @NotBlank(groups = OnCreate.class, message = "Nom must not be blank")
+        String description,
+        @NotBlank(groups = OnCreate.class, message = "Nom must not be blank")
+        String utilisation,
+        @NotBlank(groups = OnCreate.class, message = "Nom must not be blank")
+        String region,
+        @NotBlank(groups = OnCreate.class, message = "Nom must not be blank")
+        String precautions,
+        String images
 ) {
 }

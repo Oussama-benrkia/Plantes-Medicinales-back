@@ -15,13 +15,13 @@ import java.util.Map;
 
 public class PlantesResponse {
     private Long id;
-    private String nom;
+    private String name;
     private String description;
     private String region;
     private String utilisation;
     private String precautions;
     private String image;
-    private String dateCreation;
+    private String dateCreated;
 
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private Map<String, Object> maladies;
