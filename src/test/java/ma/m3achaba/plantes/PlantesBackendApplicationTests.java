@@ -1,4 +1,5 @@
 package ma.m3achaba.plantes;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -23,18 +24,20 @@ public class PlantesBackendApplicationTests {
 
     private MockedStatic<Files> mockedFiles;
 
-    @BeforeEach
-    void setUp() {
-        mockedFiles = Mockito.mockStatic(Files.class);
-    }
-
     @AfterEach
     void tearDown() {
-        mockedFiles.close(); // Close MockedStatic to deregister
+        // Ensure the static mock is deregistered after each test
+        if (mockedFiles != null) {
+            mockedFiles.close();
+        }
     }
 
     @Test
     void testDirectoryCreation() throws Exception {
+        // Mocking static Files within the test method
+        Mockito.clearAllCaches();
+        mockedFiles = Mockito.mockStatic(Files.class);
+
         mockedFiles.when(() -> Files.exists(any(Path.class))).thenReturn(false);
         mockedFiles.when(() -> Files.createDirectories(any(Path.class))).thenReturn(null);
 
@@ -50,6 +53,7 @@ public class PlantesBackendApplicationTests {
 
         commandLineRunner.run();
 
+        // Verify that createDirectories was called exactly once for each directory
         for (String dir : new String[]{"uploads", "uploads/user", "uploads/plante", "uploads/article"}) {
             Path path = Paths.get(dir);
             mockedFiles.verify(() -> Files.createDirectories(path), times(1));
@@ -58,6 +62,11 @@ public class PlantesBackendApplicationTests {
 
     @Test
     void testDirectoryAlreadyExists() throws Exception {
+        // Mocking static Files within the test method
+        Mockito.clearAllCaches();
+
+        mockedFiles = Mockito.mockStatic(Files.class);
+
         mockedFiles.when(() -> Files.exists(any(Path.class))).thenReturn(true);
 
         CommandLineRunner commandLineRunner = args -> {
@@ -72,6 +81,7 @@ public class PlantesBackendApplicationTests {
 
         commandLineRunner.run();
 
+        // Verify that createDirectories was never called, because the directories already exist
         for (String dir : new String[]{"uploads", "uploads/user", "uploads/plante", "uploads/article"}) {
             Path path = Paths.get(dir);
             mockedFiles.verify(() -> Files.createDirectories(path), never());
@@ -80,6 +90,11 @@ public class PlantesBackendApplicationTests {
 
     @Test
     void testErrorWhileCreatingDirectory() throws Exception {
+        // Mocking static Files within the test method
+        Mockito.clearAllCaches();
+
+        mockedFiles = Mockito.mockStatic(Files.class);
+
         mockedFiles.when(() -> Files.exists(any(Path.class))).thenReturn(false);
         mockedFiles.when(() -> Files.createDirectories(any(Path.class))).thenThrow(new IOException("Test exception"));
 
@@ -99,6 +114,7 @@ public class PlantesBackendApplicationTests {
 
         commandLineRunner.run();
 
+        // Verify that createDirectories was called exactly once for each directory
         for (String dir : new String[]{"uploads", "uploads/user", "uploads/plante", "uploads/article"}) {
             Path path = Paths.get(dir);
             mockedFiles.verify(() -> Files.createDirectories(path), times(1));
