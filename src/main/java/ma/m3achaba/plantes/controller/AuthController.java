@@ -5,6 +5,7 @@ import ma.m3achaba.plantes.dto.RegisterRequest;
 import ma.m3achaba.plantes.dto.RegisterResponse;
 import ma.m3achaba.plantes.services.imp.AuthenticationUserService;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
 import org.springframework.validation.annotation.Validated;
@@ -20,7 +21,7 @@ public class AuthController {
 
     private final AuthenticationUserService authservice;
 
-    @PostMapping("/register")
+    @PostMapping(value = "/register" , consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<RegisterResponse> register(@Validated @RequestBody RegisterRequest.RegisterRequestRegister registerRequest) {
         RegisterResponse registerResponse = authservice.register(registerRequest);
         return new ResponseEntity<>(registerResponse, HttpStatus.CREATED);

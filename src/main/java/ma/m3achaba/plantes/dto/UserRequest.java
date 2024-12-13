@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import ma.m3achaba.plantes.validation.OnCreate;
 import ma.m3achaba.plantes.validation.OnUpdate;
+import org.springframework.web.multipart.MultipartFile;
 
 public record UserRequest(
         @NotBlank( groups = OnCreate.class, message = "Prenom must not be blank")
@@ -18,5 +19,6 @@ public record UserRequest(
         @NotBlank(groups = OnCreate.class,message = "Password must not be blank")
         @Size(groups = OnCreate.class,min = 8, message = "Password must be at least 8 characters long")
         String password,
-        String role
+        String role,
+        MultipartFile file
 ) {}

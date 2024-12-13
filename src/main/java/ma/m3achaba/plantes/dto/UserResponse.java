@@ -19,4 +19,5 @@ public class UserResponse {
     private String prenom;
     private String email;
     private String role;
+    private String image;
 }

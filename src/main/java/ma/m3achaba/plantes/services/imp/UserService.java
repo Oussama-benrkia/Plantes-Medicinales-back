@@ -4,7 +4,6 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import ma.m3achaba.plantes.common.PageResponse;
-import ma.m3achaba.plantes.dto.RegisterRequest;
 import ma.m3achaba.plantes.dto.UserRequest;
 import ma.m3achaba.plantes.dto.UserResponse;
 import ma.m3achaba.plantes.exception.OperationNotPermittedException;
@@ -13,6 +12,8 @@ import ma.m3achaba.plantes.model.Role;
 import ma.m3achaba.plantes.model.User;
 import ma.m3achaba.plantes.repo.UserRepo;
 import ma.m3achaba.plantes.services.ServiceMetier;
+import ma.m3achaba.plantes.util.images.ImagesFolder;
+import ma.m3achaba.plantes.util.images.ImgService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -35,6 +36,7 @@ public class UserService implements UserDetailsService, ServiceMetier<UserRespon
     private final PasswordEncoder passwordEncoder;
     private final UserRepo userRepo;
     private final UserMapper userMapper;
+    private final ImgService imgService;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -63,10 +65,12 @@ public class UserService implements UserDetailsService, ServiceMetier<UserRespon
         if (userRepo.existsByEmail(request.email())) {
             throw new OperationNotPermittedException("User with email " + request.email() + " already exists");
         }
+        String path=imgService.addImage(request.file(), ImagesFolder.USER);
 
         User user = userMapper.toEntity(request);
         user.setPassword(passwordEncoder.encode(request.password()));
         user.setRole(Optional.ofNullable(request.role()).map(Role::valueOf).orElse(Role.USER));
+        user.setImage(path);
 
         User savedUser = userRepo.save(user);
         return Optional.of(userMapper.toResponse(savedUser));
@@ -88,6 +92,9 @@ public class UserService implements UserDetailsService, ServiceMetier<UserRespon
     public Optional<UserResponse> delete(Long id) {
         User user = findUserById(id);
         userRepo.delete(user);
+        if(!user.getImage().isEmpty()) {
+            imgService.deleteImage(user.getImage());
+        }
         return Optional.of(userMapper.toResponse(user));
     }
 
@@ -151,7 +158,6 @@ public class UserService implements UserDetailsService, ServiceMetier<UserRespon
         return userRepo.findByEmail(userDetails.getUsername())
                 .orElseThrow(() -> new IllegalStateException("User not found with email: " + userDetails.getUsername()));
     }
-
     private boolean updateUserFields(UserRequest request, User user) {
         boolean updated = false;
 
@@ -183,10 +189,15 @@ public class UserService implements UserDetailsService, ServiceMetier<UserRespon
             user.setRole(Role.valueOf(request.role()));
             updated = true;
         }
+        if(!request.file().isEmpty()) {
+            imgService.deleteImage(user.getImage());
+            String path=imgService.addImage(request.file(), ImagesFolder.USER);
+            user.setImage(path);
+            updated = true;
+        }
 
         return updated;
     }
-
     private PageResponse<UserResponse> createPageResponse(Page<User> page) {
         List<UserResponse> content = page.getContent().stream().map(userMapper::toResponse).toList();
 
@@ -200,7 +211,6 @@ public class UserService implements UserDetailsService, ServiceMetier<UserRespon
                 .totalPages(page.getTotalPages())
                 .build();
     }
-
     private boolean isUpdated(String newValue, String oldValue) {
         return newValue != null && !newValue.isBlank() && !newValue.equals(oldValue);
     }

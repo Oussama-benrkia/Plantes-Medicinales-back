@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Base64;
 import java.util.Date;
-import java.util.HashMap;
+import java.util.Map;
 import java.util.function.Function;
 
 @Service
@@ -43,7 +43,7 @@ public class JwtUtils {
                 .compact();
     }
 
-    public String generateRefreshToken(HashMap<String, Object> claims, UserDetails userDetails) {
+    public String generateRefreshToken(Map<String, Object> claims, UserDetails userDetails) {
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime expiration = now.plusSeconds(REFRESH_TOKEN_EXPIRATION_SECONDS);
 

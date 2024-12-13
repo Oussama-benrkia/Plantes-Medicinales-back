@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Builder;
 import lombok.Value;
+import org.springframework.web.multipart.MultipartFile;
 
 public class RegisterRequest {
 
@@ -36,6 +37,8 @@ public class RegisterRequest {
         @NotBlank(message = "Password must not be blank")
         @Size(min = 8, message = "Password must be at least 8 characters long")
         String password;
+
+        MultipartFile file;
     }
 
     @Value
