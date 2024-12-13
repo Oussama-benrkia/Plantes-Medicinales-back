@@ -7,7 +7,9 @@ import ma.m3achaba.plantes.dto.RegisterResponse;
 import ma.m3achaba.plantes.exception.OperationNotPermittedException;
 import ma.m3achaba.plantes.mapper.RegisterMapper;
 import ma.m3achaba.plantes.model.Role;
+import ma.m3achaba.plantes.model.Token;
 import ma.m3achaba.plantes.model.User;
+import ma.m3achaba.plantes.repo.TokenRepository;
 import ma.m3achaba.plantes.repo.UserRepo;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -27,6 +29,7 @@ public class AuthenticationUserService {
     private final JwtUtils jwtService;
     private final AuthenticationManager authenticationManager;
     private final RegisterMapper registerMapper;
+    private final TokenRepository tokenRepository;
 
     /**
      * Registers a new user.
@@ -35,15 +38,14 @@ public class AuthenticationUserService {
         if (userRepo.existsByEmail(registerRequest.getEmail())) {
             throw new EntityNotFoundException("User with this email already exists.");
         }
-
         User newUser = registerMapper.toEntity(registerRequest);
         newUser.setPassword(passwordEncoder.encode(newUser.getPassword()));
         newUser.setRole(Role.USER);
         userRepo.save(newUser);
-
-        String jwt = jwtService.generateToken(newUser);
+        String jwt = jwtService.generateAccessToken(newUser);
         String refreshToken = jwtService.generateRefreshToken(new HashMap<>(), newUser);
-
+        this.saveUserToken(newUser, jwt,false,refreshToken);
+        this.saveUserToken(newUser, refreshToken,true,"");
         return RegisterResponse.builder()
                 .statusCode(200)
                 .message("User registered successfully")
@@ -51,7 +53,6 @@ public class AuthenticationUserService {
                 .refreshToken(refreshToken)
                 .build();
     }
-
     /**
      * Authenticates a user with their email and password.
      */
@@ -66,8 +67,10 @@ public class AuthenticationUserService {
         User user = userRepo.findByEmail(loginRequest.getEmail())
                 .orElseThrow(() -> new EntityNotFoundException("User not found with this email."));
 
-        String jwt = jwtService.generateToken(user);
+        String jwt = jwtService.generateAccessToken(user);
         String refreshToken = jwtService.generateRefreshToken(new HashMap<>(), user);
+        this.saveUserToken(user, jwt,false,refreshToken);
+        this.saveUserToken(user, refreshToken,true,"");
 
         return RegisterResponse.builder()
                 .statusCode(200)
@@ -89,7 +92,8 @@ public class AuthenticationUserService {
             throw new OperationNotPermittedException("Invalid token.");
         }
 
-        String newJwt = jwtService.generateToken(user);
+        String newJwt = jwtService.generateAccessToken(user);
+        this.saveUserToken(user, newJwt,false,refreshTokenRequest.getToken());
         return RegisterResponse.builder()
                 .statusCode(200)
                 .message("Token refreshed successfully")
@@ -97,4 +101,16 @@ public class AuthenticationUserService {
                 .refreshToken(refreshTokenRequest.getToken())
                 .build();
     }
+    private void saveUserToken(User user, String jwtToken,boolean refreshToken,String refreshTokenUser) {
+        var token = Token.builder()
+                .user(user)
+                .token(jwtToken)
+                .expired(false)
+                .revoked(false)
+                .isRefreshToken(refreshToken)
+                .refreshToken(refreshTokenUser)
+                .build();
+        tokenRepository.save(token);
+    }
+
 }

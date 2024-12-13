@@ -21,7 +21,8 @@ import java.util.function.Function;
 public class JwtUtils {
 
     private final SecretKey key;
-    private static final long EXPIRATION_TIME_SECONDS = 86400; // 24 heures en secondes
+    private static final long ACCESS_TOKEN_EXPIRATION_SECONDS = 3600; // 1 heure
+    private static final long REFRESH_TOKEN_EXPIRATION_SECONDS = 604800; // 7 jours
 
     public JwtUtils() {
         String secretString = "843567893696976453275974432697R634976R738467TR678T34865R6834R8763T478378637664538745673865783678548735687R3";
@@ -29,9 +30,9 @@ public class JwtUtils {
         this.key = new SecretKeySpec(keyBytes, SignatureAlgorithm.HS256.getJcaName());
     }
 
-    public String generateToken(UserDetails userDetails) {
+    public String generateAccessToken(UserDetails userDetails) {
         LocalDateTime now = LocalDateTime.now();
-        LocalDateTime expiration = now.plusSeconds(EXPIRATION_TIME_SECONDS);
+        LocalDateTime expiration = now.plusSeconds(ACCESS_TOKEN_EXPIRATION_SECONDS);
 
         return Jwts.builder()
                 .setSubject(userDetails.getUsername())
@@ -44,7 +45,7 @@ public class JwtUtils {
 
     public String generateRefreshToken(HashMap<String, Object> claims, UserDetails userDetails) {
         LocalDateTime now = LocalDateTime.now();
-        LocalDateTime expiration = now.plusSeconds(EXPIRATION_TIME_SECONDS);
+        LocalDateTime expiration = now.plusSeconds(REFRESH_TOKEN_EXPIRATION_SECONDS);
 
         return Jwts.builder()
                 .setClaims(claims)
@@ -67,10 +68,10 @@ public class JwtUtils {
                 && tokenRole != null
                 && tokenRole.equals(userRole));
     }
-    public String extractRole(String token) {
-        return extractClaims(token, claims -> claims.get("role", String.class)); // adjust for your claim structure
-    }
 
+    public String extractRole(String token) {
+        return extractClaims(token, claims -> claims.get("role", String.class));
+    }
 
     private boolean isTokenExpired(String token) {
         LocalDateTime expiration = extractExpiration(token);

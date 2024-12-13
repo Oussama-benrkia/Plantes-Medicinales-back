@@ -20,4 +20,6 @@ public class Token extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     public User user;
+    private boolean isRefreshToken;
+    private String refreshToken;
 }
