@@ -13,4 +13,6 @@ import ma.m3achaba.plantes.common.BaseEntity;
 @Data
 public class Maladies extends BaseEntity {
     private String name;
+
+
 }
