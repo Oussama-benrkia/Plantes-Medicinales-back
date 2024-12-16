@@ -12,6 +12,7 @@ spring:
     multipart:
       enabled: true
 
+
 logging:
   file:
     path: ./logging/global/logs

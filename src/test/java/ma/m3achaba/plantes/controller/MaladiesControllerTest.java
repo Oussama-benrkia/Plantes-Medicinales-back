@@ -1,6 +1,7 @@
 package ma.m3achaba.plantes.controller;
 
-import static org.junit.jupiter.api.Assertions.*;
+
+import ma.m3achaba.plantes.services.imp.JwtUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -8,7 +9,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -39,7 +39,6 @@ public class MaladiesControllerTest {
 
     @MockitoBean
     private MaladiesService maladiesService;
-
     @Autowired
     private ObjectMapper objectMapper;
 
@@ -59,7 +58,6 @@ public class MaladiesControllerTest {
     @Test
     void findById_ExistingId_ReturnsOk() throws Exception {
         when(maladiesService.findById(1L)).thenReturn(Optional.of(mockResponse));
-
         mockMvc.perform(get("/api/maladies/1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1L))
