@@ -1,13 +1,13 @@
 package ma.m3achaba.plantes;
 
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.io.IOException;
@@ -20,6 +20,7 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
+@ActiveProfiles("test")
 public class PlantesBackendApplicationTests {
 
     private MockedStatic<Files> mockedFiles;
@@ -34,7 +35,6 @@ public class PlantesBackendApplicationTests {
 
     @Test
     void testDirectoryCreation() throws Exception {
-        // Mocking static Files within the test method
         Mockito.clearAllCaches();
         mockedFiles = Mockito.mockStatic(Files.class);
 
