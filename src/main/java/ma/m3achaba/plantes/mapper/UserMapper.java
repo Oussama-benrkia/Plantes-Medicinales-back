@@ -31,7 +31,7 @@ public class UserMapper implements Mapper<User, UserResponse, UserRequest> {
 
         String imageUrl = null;
         if (user != null && user.getImage() != null && !user.getImage().isEmpty()) {
-            imageUrl = "http://" + serverAddress + ":" + serverPort + "/images/" + user.getImage(); // Assuming image path is in /images
+            imageUrl = "http://" + serverAddress + ":" + serverPort + "/api/image/" + user.getImage(); // Assuming image path is in /images
         }
         return user == null ? null : UserResponse.builder()
                 .id(user.getId())

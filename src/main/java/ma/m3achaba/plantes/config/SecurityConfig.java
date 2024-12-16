@@ -31,11 +31,12 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(request -> request
-                        .requestMatchers("/auth/login", "/auth/register","/api/image/**").permitAll()
+                        .requestMatchers("/auth/register").permitAll()
+                        .requestMatchers("/auth/login").permitAll()
                         .requestMatchers("/v3/api-docs/**",
-                                        "/swagger-ui/**",
-                                        "/swagger-ui.html").permitAll()
-                        .requestMatchers(HttpMethod.GET,"/api/image/").permitAll()
+                                "/swagger-ui/**",
+                                "/swagger-ui.html").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/image/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

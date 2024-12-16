@@ -9,7 +9,6 @@ import ma.m3achaba.plantes.services.imp.UserService;
 import ma.m3achaba.plantes.validation.OnCreate;
 import ma.m3achaba.plantes.validation.OnUpdate;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -67,20 +66,21 @@ public class UserController {
 
 
 
-    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<UserResponse> saveUser(
-            @Validated(OnCreate.class) @RequestBody UserRequest request) {
+            @Validated(OnCreate.class) @ModelAttribute UserRequest request) {
 
         return userService.save(request)
-                .map(ResponseEntity::ok)
+                .map(response -> ResponseEntity.status(HttpStatus.CREATED).body(response))
                 .orElseThrow(() -> new ResourceNotFoundException("Unable to save user."));
     }
 
-    @PutMapping(path = "/{id}",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+
+    @PutMapping(path = "/{id}")
     public ResponseEntity<UserResponse> updateUser(
             @PathVariable Long id,
-            @Validated(OnUpdate.class) @RequestBody UserRequest request) {
+            @Validated(OnUpdate.class) @ModelAttribute UserRequest request) {
 
         return userService.update(request, id)
                 .map(ResponseEntity::ok)

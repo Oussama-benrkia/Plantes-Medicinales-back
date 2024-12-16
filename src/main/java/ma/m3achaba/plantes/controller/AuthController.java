@@ -21,8 +21,8 @@ public class AuthController {
 
     private final AuthenticationUserService authservice;
 
-    @PostMapping(value = "/register" , consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<RegisterResponse> register(@Validated @RequestBody RegisterRequest.RegisterRequestRegister registerRequest) {
+    @PostMapping(value = "/register")
+    public ResponseEntity<RegisterResponse> register(@Validated @ModelAttribute RegisterRequest.RegisterRequestRegister registerRequest) {
         RegisterResponse registerResponse = authservice.register(registerRequest);
         return new ResponseEntity<>(registerResponse, HttpStatus.CREATED);
     }
