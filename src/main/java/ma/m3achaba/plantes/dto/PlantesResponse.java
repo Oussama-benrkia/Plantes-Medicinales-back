@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
 import java.util.Map;
 
 @Builder
@@ -22,7 +23,5 @@ public class PlantesResponse {
     private String precautions;
     private String image;
     private String dateCreated;
-
-    @JsonInclude(JsonInclude.Include.NON_EMPTY)
-    private Map<String, Object> maladies;
+    private List<String> maladies;
 }

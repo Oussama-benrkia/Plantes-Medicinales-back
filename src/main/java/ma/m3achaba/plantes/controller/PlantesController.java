@@ -50,19 +50,21 @@ public class PlantesController {
     }
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public PlantesResponse savePlantes(
+    public ResponseEntity<PlantesResponse> savePlantes(
             @Validated(OnCreate.class) @RequestBody PlantesRequest request
     ) {
         return plantesService.save(request)
-                .orElseThrow(() -> new ResourceNotFoundException("Unable to save Plantes"));
+                .map(response -> ResponseEntity.status(HttpStatus.CREATED).body(response))
+                .orElseThrow(() -> new ResourceNotFoundException("Failed to save Plantes. Please check your request."));
     }
     @PutMapping("/{id}")
-    public PlantesResponse updatePlantes(
+    public ResponseEntity<PlantesResponse> updatePlantes(
             @PathVariable Long id,
             @Validated(OnUpdate.class) @RequestBody PlantesRequest request
     ) {
         return plantesService.update(request, id)
-                .orElseThrow(() -> new ResourceNotFoundException("Unable to update Plantes with id: " + id));
+                .map(ResponseEntity::ok)
+                .orElseThrow(() -> new ResourceNotFoundException("Plantes with ID " + id + " could not be updated. Please verify the provided data."));
     }
 
     @DeleteMapping("/{id}")

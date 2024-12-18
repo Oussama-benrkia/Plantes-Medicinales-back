@@ -7,9 +7,11 @@ import ma.m3achaba.plantes.common.PageResponse;
 import ma.m3achaba.plantes.dto.MaladiesResponse;
 import ma.m3achaba.plantes.dto.PlantesRequest;
 import ma.m3achaba.plantes.dto.PlantesResponse;
+import ma.m3achaba.plantes.mapper.MaladiesMapper;
 import ma.m3achaba.plantes.mapper.PlantesMapper;
 import ma.m3achaba.plantes.model.Maladies;
 import ma.m3achaba.plantes.model.Plantes;
+import ma.m3achaba.plantes.repo.MaladiesRepository;
 import ma.m3achaba.plantes.repo.PlantesRepository;
 import ma.m3achaba.plantes.services.ServiceMetier;
 import org.springframework.data.domain.PageRequest;
@@ -25,6 +27,7 @@ import java.util.Optional;
 public class PlantesService implements ServiceMetier<PlantesResponse, PlantesRequest> {
     private final PlantesRepository plantesRepository;
     private final PlantesMapper plantesMapper;
+    private final MaladiesRepository maladiesRepository;
 
     private Plantes findPlanteById(Long id) {
         return plantesRepository.findById(id)
@@ -71,14 +74,32 @@ public class PlantesService implements ServiceMetier<PlantesResponse, PlantesReq
         if (plantesRepository.existsByName(t.name())) {
             throw new EntityNotFoundException("Plante " + t.name() + " already exists");
         }
-        Plantes res = plantesRepository.save(plantesMapper.toEntity(t));
+        List<Long> maladieIds = t.maladie().stream()
+                .map(Long::valueOf)
+                .toList();
+        List<Maladies> maladies = maladiesRepository.findAllById(maladieIds);
+        if (maladies.size() != maladieIds.size()) {
+            throw new EntityNotFoundException("Some Maladie IDs are not valid");
+        }
+        Plantes plante = plantesMapper.toEntity(t);
+        plante.setMaladies(maladies);
+        Plantes res = plantesRepository.save(plante);
         return Optional.ofNullable(plantesMapper.toResponse(res));
     }
+
 
     @Override
     public Optional<PlantesResponse> update(PlantesRequest t, Long id) {
         Plantes plantes = findPlanteById(id);
         boolean change = false;
+        List<Long> maladieIds = t.maladie().stream()
+                .map(Long::valueOf)
+                .toList();
+        List<Maladies> maladies = maladiesRepository.findAllById(maladieIds);
+        if (maladies.size() != maladieIds.size()) {
+            throw new EntityNotFoundException("Some Maladie IDs are not valid");
+        }
+        plantes.setMaladies(maladies);
 
         if (t.name() != null && !t.name().isEmpty() && !t.name().equals(plantes.getName())) {
             plantes.setName(t.name());
@@ -104,11 +125,13 @@ public class PlantesService implements ServiceMetier<PlantesResponse, PlantesReq
             plantes = plantesRepository.save(plantes);
         }
         return Optional.ofNullable(plantesMapper.toResponse(plantes));
+
     }
 
     @Override
     public Optional<PlantesResponse> delete(Long id) {
         Plantes plantes = findPlanteById(id);
+        plantes.getMaladies().clear();
         plantesRepository.delete(plantes);
         return Optional.ofNullable(plantesMapper.toResponse(plantes));
     }
