@@ -20,7 +20,7 @@ import java.util.List;
 @RequestMapping("/api/maladies")
 @RequiredArgsConstructor
 public class MaladiesController {
-    private final MaladiesService maladiesService;
+    private final MaladiesService  maladiesService;
 
     @GetMapping("/{id}")
     public ResponseEntity<MaladiesResponse> findById(@PathVariable Long id) {
@@ -54,21 +54,20 @@ public class MaladiesController {
     }
 
     @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    public MaladiesResponse saveMaladie(
-            @Validated(OnCreate.class) @RequestBody MaladiesRequest request
-    ) {
+    public ResponseEntity<MaladiesResponse> saveMaladie(
+            @Validated(OnCreate.class) @RequestBody MaladiesRequest request) {
         return maladiesService.save(request)
-                .orElseThrow(() -> new ResourceNotFoundException("Unable to save Maladies"));
+                .map(response -> ResponseEntity.status(HttpStatus.CREATED).body(response))
+                .orElseThrow(() -> new ResourceNotFoundException("Failed to save Maladies. Please check your request."));
     }
 
     @PutMapping("/{id}")
-    public MaladiesResponse updateMaladie(
+    public ResponseEntity<MaladiesResponse> updateMaladie(
             @PathVariable Long id,
-            @Validated(OnUpdate.class) @RequestBody MaladiesRequest request
-    ) {
+            @Validated(OnUpdate.class) @RequestBody MaladiesRequest request) {
         return maladiesService.update(request, id)
-                .orElseThrow(() -> new ResourceNotFoundException("Unable to update Maladies with id: " + id));
+                .map(ResponseEntity::ok)
+                .orElseThrow(() -> new ResourceNotFoundException("Maladies with ID " + id + " could not be updated. Please verify the provided data."));
     }
 
     @DeleteMapping("/{id}")
